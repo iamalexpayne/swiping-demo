@@ -12,7 +12,6 @@ const translateX = ref(0);
 const innerWidth = ref(window.innerWidth);
 
 const childComponent = useTemplateRef('childComponent');
-const parentComponent = useTemplateRef('parentComponent');
 const childTranslateX = ref(innerWidth.value);
 
 watch(childComponent, async (val) => {
@@ -31,13 +30,12 @@ const transformChildView = computed(() => {
   return `translateX(${childTranslateX.value}px)`;
 });
 
-const transformCurrentView = computed(() => {
-  if (isGoingBack.value) {
-    return `translateX(${translateX.value + innerWidth.value}px)`;
-  } else if (childComponent.value && childView.value) {
-    return `translateX(${translateX.value - innerWidth.value}px)`;
+const parentComponent = useTemplateRef('parentComponent');
+
+watch(parentComponent, () => {
+  if (parentComponent.value?.$el) {
+    parentComponent.value.$el.style.transform = `translateX(-${innerWidth.value}px)`;
   }
-  return `translateX(${translateX.value}px)`;
 });
 
 const transformParentView = computed(() => {
@@ -46,6 +44,15 @@ const transformParentView = computed(() => {
   } else {
     return `translateX(${translateX.value - innerWidth.value}px)`;
   }
+});
+
+const transformCurrentView = computed(() => {
+  if (isGoingBack.value) {
+    return `translateX(${translateX.value + innerWidth.value}px)`;
+  } else if (childComponent.value && childView.value) {
+    return `translateX(${translateX.value - innerWidth.value}px)`;
+  }
+  return `translateX(${translateX.value}px)`;
 });
 
 function handleTouchStart(event) {
@@ -124,12 +131,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateInnerWidth);
-});
-
-watch(parentComponent, () => {
-  if (parentComponent.value?.$el) {
-    parentComponent.value.$el.style.transform = `translateX(-${innerWidth.value}px)`;
-  }
 });
 
 async function syncRouteStack() {
