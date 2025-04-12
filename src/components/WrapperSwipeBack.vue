@@ -1,6 +1,6 @@
 <script setup>
 import { childView, currentView, getView, isGoingBack, parentView, routeStack } from '@/composables/useWrapperSwipeBack';
-import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch, watchEffect } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -12,6 +12,7 @@ const translateX = ref(0);
 const innerWidth = ref(window.innerWidth);
 
 const childComponent = useTemplateRef('childComponent');
+const parentComponent = useTemplateRef('parentComponent');
 const childTranslateX = ref(innerWidth.value);
 
 watch(childComponent, async (val) => {
@@ -37,6 +38,14 @@ const transformCurrentView = computed(() => {
     return `translateX(${translateX.value - innerWidth.value}px)`;
   }
   return `translateX(${translateX.value}px)`;
+});
+
+const transformParentView = computed(() => {
+  if (isGoingBack.value) {
+    return `translateX(${translateX.value}px)`;
+  } else {
+    return `translateX(${translateX.value - innerWidth.value}px)`;
+  }
 });
 
 function handleTouchStart(event) {
@@ -117,9 +126,10 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateInnerWidth);
 });
 
-let count = 0;
-watchEffect(() => {
-  console.log('parentView', count++, parentView.value);
+watch(parentComponent, () => {
+  if (parentComponent.value?.$el) {
+    parentComponent.value.$el.style.transform = `translateX(-${innerWidth.value}px)`;
+  }
 });
 
 async function syncRouteStack() {
@@ -154,12 +164,12 @@ async function syncRouteStack() {
       ref="parentComponent"
       class="absolute top-0 left-0 z-0 will-change-transform overflow-y-auto h-full"
       :class="{ 'transition-transform duration-600 ease-in-out': !isDragging }"
-      :style="{ transform: `translateX(${isGoingBack ? translateX : translateX - innerWidth}px)` }"
+      :style="{ transform: transformParentView }"
     />
 
     <component
       :is="currentView"
-      class="absolute top-0 opacity-50 left-0 z-10 will-change-transform overflow-y-auto"
+      class="absolute top-0 left-0 z-10 will-change-transform overflow-y-auto"
       :class="{ 'transition-transform duration-600 ease-in-out': !isDragging }"
       :style="{ transform: transformCurrentView }"
     />
