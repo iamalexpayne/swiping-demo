@@ -17,32 +17,34 @@ function isActive(name) {
 </script>
 
 <template>
-  <RouterView v-slot="{ Component }">
-    <component :is="Component" />
-  </RouterView>
-  <div class="fixed bottom-0 z-50 left-0 w-full bg-gray-800 text-white text-center">
-    <div class="flex flex-row justify-evenly items-center">
-      <RouterLink
-        :to="{ name: 'home' }"
-        class="hover:underline pt-6 pb-10 px-6"
-        :class="{ 'text-blue-500': isActive('home') }"
-      >
-        Home
-      </RouterLink>
-      <RouterLink
-        :to="{ name: 'about' }"
-        class="hover:underline pt-6 pb-10 px-6"
-        :class="{ 'text-blue-500': isActive('about') }"
-      >
-        About
-      </RouterLink>
-      <RouterLink
-        :to="{ name: 'profileMenu' }"
-        class="hover:underline pt-6 pb-10 px-6"
-        :class="{ 'text-blue-500': isActive('profileMenu') }"
-      >
-        Profile
-      </RouterLink>
+  <div class="fixed flex flex-col h-screen w-screen overflow-hidden">
+    <RouterView v-slot="{ Component }">
+      <component :is="Component" />
+    </RouterView>
+    <div class="z-50 left-0 w-full bg-gray-800 text-white text-center h-32">
+      <div class="flex flex-row justify-evenly items-center">
+        <RouterLink
+          :to="{ name: 'home' }"
+          class="hover:underline pt-6 pb-10 px-6"
+          :class="{ 'text-blue-500': isActive('home') }"
+        >
+          Home
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'about' }"
+          class="hover:underline pt-6 pb-10 px-6"
+          :class="{ 'text-blue-500': isActive('about') }"
+        >
+          About
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'profileMenu' }"
+          class="hover:underline pt-6 pb-10 px-6"
+          :class="{ 'text-blue-500': isActive('profileMenu') }"
+        >
+          Profile
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>

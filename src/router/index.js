@@ -1,4 +1,4 @@
-import { rootPath, rootView, subView } from '@/composables/useWrapperSwipeBackVariables';
+import { childView, currentView, getView, isGoingBack, parentView, routeStack } from '@/composables/useWrapperSwipeBack';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -8,23 +8,25 @@ const router = createRouter({
       path: '',
       component: () => import('@/components/WrapperSwipeBack.vue'),
       meta: {
-        rootRouteName: 'home',
+        handlesSwipeBack: true,
       },
       children: [
         {
           path: '',
           name: 'home',
           component: () => import('@/views/home/HomeRoot.vue'),
-        },
-        {
-          path: 'sub-view',
-          name: 'homeSub',
-          component: () => import('@/views/home/HomeSub.vue'),
-        },
-        {
-          path: 'other-sub-view',
-          name: 'homeSub1',
-          component: () => import('@/views/home/HomeSub1.vue'),
+          children: [
+            {
+              path: 'child-view',
+              name: 'homeSub',
+              component: () => import('@/views/home/HomeSub.vue'),
+            },
+            {
+              path: 'other-child-view',
+              name: 'homeSub1',
+              component: () => import('@/views/home/HomeSub1.vue'),
+            },
+          ],
         },
       ],
     },
@@ -37,57 +39,42 @@ const router = createRouter({
       path: '/profile',
       component: () => import('@/components/WrapperSwipeBack.vue'),
       meta: {
-        rootRouteName: 'profileMenu',
+        handlesSwipeBack: true,
       },
       children: [
         {
           path: '',
           name: 'profileMenu',
           component: () => import('@/views/profile/ProfileMenu.vue'),
-        },
-
-        {
-          path: 'settings',
-          name: 'settings',
-          component: () => import('@/components/WrapperSwipeBack.vue'),
-          meta: {
-            rootRouteName: 'profileSettingsMenu',
-          },
           children: [
             {
-              path: '',
+              path: 'settings',
               name: 'profileSettingsMenu',
               component: () => import('@/views/profile/settings/SettingsMenu.vue'),
+              children: [
+                {
+                  path: 'notifications',
+                  name: 'profileSettingsNotifications',
+                  component: () => import('@/views/profile/settings/SettingsNotifications.vue'),
+                },
+                {
+                  path: 'security',
+                  name: 'profileSettingsSecurity',
+                  component: () => import('@/views/profile/settings/SettingsSecurity.vue'),
+                },
+              ],
             },
             {
-              path: 'notifications',
-              name: 'profileSettingsNotifications',
-              component: () => import('@/views/profile/settings/SettingsNotifications.vue'),
-            },
-            {
-              path: 'security',
-              name: 'profileSettingsSecurity',
-              component: () => import('@/views/profile/settings/SettingsSecurity.vue'),
-            },
-          ],
-        },
-        {
-          path: 'public',
-          name: 'public',
-          component: () => import('@/components/WrapperSwipeBack.vue'),
-          meta: {
-            rootRouteName: 'profilePublicDetails',
-          },
-          children: [
-            {
-              path: '',
+              path: 'public',
               name: 'profilePublicDetails',
               component: () => import('@/views/profile/public/PublicDetails.vue'),
-            },
-            {
-              path: 'edit',
-              name: 'profilePublicDetailsEdit',
-              component: () => import('@/views/profile/public/PublicDetailsEdit.vue'),
+              children: [
+                {
+                  path: 'edit',
+                  name: 'profilePublicDetailsEdit',
+                  component: () => import('@/views/profile/public/PublicDetailsEdit.vue'),
+                },
+              ],
             },
           ],
         },
@@ -96,56 +83,50 @@ const router = createRouter({
   ],
 });
 
-router.beforeResolve(async (to, from, next) => {
-  const matched = to.matched;
+router.beforeResolve(async (to) => {
+  const handlesSwipeBack = to.matched.some((route) => route.meta.handlesSwipeBack);
 
-  if (matched.length === 1) {
-    return next();
-  }
+  if (handlesSwipeBack) {
+    const targetRouteIndex = routeStack.value.indexOf(to.name);
 
-  let newRootRouteName = null;
-  for (let i = matched.length - 1; i >= 0; i--) {
-    if (matched[i].meta.rootRouteName) {
-      newRootRouteName = matched[i].meta.rootRouteName;
-      break;
+    // if not in the same stack, reset the stack
+    if (to.matched[1].name !== routeStack.value[0] && routeStack.value.length > 0) {
+      routeStack.value = [];
+      parentView.value = null;
+      currentView.value = null;
+      childView.value = null;
     }
+
+    // if stack is empty, build the stack
+    if (routeStack.value.length < 1) {
+      for (let i = 0; i < to.matched.length; i++) {
+        const route = to.matched[i];
+        if (route.name) {
+          routeStack.value.push(route.name);
+        }
+      }
+      currentView.value = await getView(to.name, router);
+      if (routeStack.value.length > 1) {
+        parentView.value = await getView(routeStack.value.at(-2), router);
+      }
+    }
+    // if the target route is not in the stack, add target route to the stack
+    else if (targetRouteIndex === -1) {
+      childView.value = await getView(to.name, router);
+      routeStack.value.push(to.name);
+    }
+    // if the target route is in the stack, remove all routes after it
+    else if (targetRouteIndex > -1) {
+      parentView.value = await getView(routeStack.value.at(targetRouteIndex), router);
+      isGoingBack.value = true;
+      routeStack.value.splice(targetRouteIndex + 1);
+    }
+  } else {
+    routeStack.value = [];
+    parentView.value = null;
+    currentView.value = null;
+    childView.value = null;
   }
-
-  const newRootPath = router.getRoutes().find((route) => route.name === newRootRouteName);
-  const sub = matched.at(-1);
-
-  if (to.name !== newRootPath.name) {
-    setSubView(sub);
-  }
-  setRootView(newRootPath);
-
-  rootPath.value = newRootPath;
-
-  next();
 });
-
-async function setSubView(path) {
-  console.log('setSubView', path);
-
-  const subComponentDefinition = path.components.default;
-
-  const subComponent = typeof subComponentDefinition === 'function' ? await subComponentDefinition() : subComponentDefinition;
-
-  subView.value = subComponent.default || subComponent;
-}
-
-async function setRootView(path) {
-  console.log('1) setRootView', path);
-  const rootComponentDefinition = path.components.default;
-  console.log('2) rootComponentDefinition', rootComponentDefinition);
-
-  const isFunction = typeof rootComponentDefinition === 'function';
-  console.log('isFunction', isFunction);
-
-  const rootComponent = isFunction ? await rootComponentDefinition() : rootComponentDefinition;
-  console.log('3) rootComponent', rootComponent);
-
-  rootView.value = rootComponent.default || rootComponent;
-}
 
 export { router };

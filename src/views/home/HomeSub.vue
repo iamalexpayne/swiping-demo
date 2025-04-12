@@ -2,7 +2,7 @@
 
 <template>
   <div class="bg-blue-200 w-full h-screen flex flex-col items-center justify-center">
-    <h1 class="text-4xl font-bold text-gray-800">Home Sub View</h1>
+    <h1 class="text-4xl font-bold text-gray-800">Child View</h1>
     <RouterLink
       to="/"
       class="text-blue-500 hover:underline mt-4"

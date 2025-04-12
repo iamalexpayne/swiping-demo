@@ -5,7 +5,7 @@
     <h1 class="text-4xl font-bold text-gray-800">Profile</h1>
     <ul>
       <li>
-        <RouterLink :to="{ name: 'public' }">Public Profile</RouterLink>
+        <RouterLink :to="{ name: 'profilePublicDetails' }">Public Profile</RouterLink>
       </li>
       <li>
         <RouterLink :to="{ name: 'profileSettingsMenu' }">Settings</RouterLink>

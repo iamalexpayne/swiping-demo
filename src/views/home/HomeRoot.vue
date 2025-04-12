@@ -18,13 +18,13 @@ const decrement = () => {
       :to="{ name: 'homeSub' }"
       class="text-blue-500 hover:underline mt-4"
     >
-      Go to Sub View
+      Go to Child
     </RouterLink>
     <RouterLink
       :to="{ name: 'homeSub1' }"
       class="text-green-500 hover:underline mt-4"
     >
-      Go to Other Sub View
+      Go to Other Child
     </RouterLink>
 
     <div class="mt-8 p-4 bg-white rounded shadow-md">
