@@ -142,8 +142,12 @@ async function syncRouteStack() {
       parentView.value = null;
     }
   } else if (childView.value) {
+    console.log('sync child start');
+
     parentView.value = currentView.value;
+    console.log('sync child middle');
     currentView.value = childView.value;
+    console.log('sync child end');
   }
 
   isGoingBack.value = false;

@@ -1,4 +1,10 @@
-<script setup></script>
+<script setup>
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  console.log('Mounted');
+});
+</script>
 
 <template>
   <div class="bg-green-200 w-full h-screen flex flex-col items-center justify-center">

@@ -112,6 +112,8 @@ router.beforeResolve(async (to) => {
     }
     // if the target route is not in the stack, add target route to the stack
     else if (targetRouteIndex === -1) {
+      console.log('add child');
+
       childView.value = await getView(to.name, router);
       routeStack.value.push(to.name);
     }
