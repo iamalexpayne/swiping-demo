@@ -90,7 +90,7 @@ router.beforeResolve(async (to) => {
     const targetRouteIndex = routeStack.value.indexOf(to.name);
 
     // if not in the same stack, reset the stack
-    if (to.matched[1].name !== routeStack.value[0] && routeStack.value.length > 0) {
+    if (to.matched[1].name !== routeStack.value[0]) {
       routeStack.value = [];
       parentView.value = null;
       currentView.value = null;
