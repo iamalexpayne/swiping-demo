@@ -1,14 +1,17 @@
 <script setup>
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 
 const count = ref(0);
-const increment = () => {
+
+async function increment() {
   count.value++;
-};
-const decrement = () => {
+  await nextTick();
+}
+
+async function decrement() {
   if (count.value > 0) count.value--;
-  else 0;
-};
+  await nextTick();
+}
 </script>
 
 <template>

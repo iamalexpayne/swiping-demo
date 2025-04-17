@@ -21,7 +21,7 @@ function isActive(name) {
     <div class="relative h-full">
       <RouterView />
     </div>
-    <div class="bg-gray-800 opacity-25 text-white text-center h-32">
+    <div class="bg-gray-800 text-white text-center h-32">
       <div class="flex flex-row justify-evenly items-center">
         <RouterLink
           :to="{ name: 'home' }"
