@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <div class="bg-green-200 w-full h-screen flex flex-col items-center justify-center">
+  <div class="bg-green-200 opacity-80 w-full h-full flex flex-col items-center justify-center">
     <RouterLink
       :to="{ name: 'profileMenu' }"
       class="text-green-500 hover:underline mt-4"

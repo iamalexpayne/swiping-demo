@@ -7,7 +7,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-green-200 w-full h-screen flex flex-col items-center justify-center">
+  <div class="bg-green-200 w-full h-full opacity-80 flex flex-col items-center justify-center">
     <h1 class="text-4xl font-bold text-gray-800">Notifications</h1>
 
     <RouterLink

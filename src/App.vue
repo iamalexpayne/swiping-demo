@@ -17,11 +17,11 @@ function isActive(name) {
 </script>
 
 <template>
-  <div class="fixed flex flex-col h-screen w-screen overflow-hidden">
-    <RouterView v-slot="{ Component }">
-      <component :is="Component" />
-    </RouterView>
-    <div class="z-50 left-0 w-full bg-gray-800 text-white text-center h-32">
+  <div class="fixed flex flex-col h-full max-h-screen w-full overflow-hidden">
+    <div class="relative h-full">
+      <RouterView />
+    </div>
+    <div class="bg-gray-800 opacity-25 text-white text-center h-32">
       <div class="flex flex-row justify-evenly items-center">
         <RouterLink
           :to="{ name: 'home' }"
