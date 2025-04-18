@@ -6,6 +6,17 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
+function getComponentProps(matchingRoute) {
+  if (typeof matchingRoute.props?.default === 'function') {
+    return matchingRoute.props.default(route);
+  } else if (typeof matchingRoute.props?.default === 'object') {
+    return matchingRoute.props.default;
+  } else if (matchingRoute.props?.default === true) {
+    return route.params;
+  }
+  return {};
+}
+
 const matchedRoutes = computed(() => {
   return route.matched.slice(1);
 });
@@ -116,12 +127,13 @@ async function handleTransitionEnd() {
       @touchstart="handleTouchStart"
       @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
-      @transitionend="handleTransitionEnd"
+      @transitionend.self="handleTransitionEnd"
     >
       <component
         v-for="(matchingRoute, index) in matchedRoutes"
         :key="index"
         :is="matchingRoute.components.default"
+        v-bind="getComponentProps(matchingRoute)"
         class="shrink-0"
       />
     </div>
