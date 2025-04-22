@@ -129,6 +129,7 @@ async function handleTransitionEnd() {
       @touchend="handleTouchEnd"
       @transitionend.self="handleTransitionEnd"
     >
+      <!-- NOTE: Any overlays used in these components need to teleport out of the swipeBackStack to ensure they are visible -->
       <component
         v-for="(matchingRoute, index) in matchedRoutes"
         :key="index"
